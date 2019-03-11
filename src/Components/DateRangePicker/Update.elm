@@ -459,13 +459,16 @@ updateDateRangeOffset ({ range, dateRangeOffset } as model) =
             case range of
                 StartDateSelected start ->
                     let
+                        isNotEqualToStartDate d =
+                            DateTime.compareDates start d /= EQ
+
                         -- Get all the future dates that are too close to the range start date.
                         -- Example for minDateRangeLength == 4 and startDate == 26 Aug 2019
                         -- [ 27 Aug 2019, 28 Aug 2019 ] will be the disabled dates because
                         -- we want a minimum length of 4 days which will be [ 26, 27, 28, 29 ]
                         -- Note that 29 Aug 2019 will be the first available date to choose ( from the future dates ).
                         invalidFutureDates =
-                            List.filter ((/=) start) <|
+                            List.filter isNotEqualToStartDate <|
                                 List.reverse <|
                                     List.drop 1 <|
                                         List.reverse <|
@@ -477,7 +480,7 @@ updateDateRangeOffset ({ range, dateRangeOffset } as model) =
                         -- we want a minimum length of 4 days which will be [ 23, 24, 25, 26 ]
                         -- Note that 23 Aug 2019 will be the first available date to choose ( from the past dates ).
                         invalidPastDates =
-                            List.filter ((/=) start) <|
+                            List.filter isNotEqualToStartDate <|
                                 List.reverse <|
                                     List.drop 1 <|
                                         DateTime.getDateRange start (DateTime.decrementDays (minDateRangeLength - 1) start) Clock.midnight

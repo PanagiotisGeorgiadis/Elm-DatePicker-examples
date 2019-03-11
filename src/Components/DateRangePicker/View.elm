@@ -440,7 +440,7 @@ checkIfInvalid : Model -> DateTime -> Bool
 checkIfInvalid { dateRangeOffset } date =
     case dateRangeOffset of
         Offset { invalidDates } ->
-            List.any ((==) date) invalidDates
+            List.any (\d -> DateTime.compareDates date d == EQ) invalidDates
 
         NoOffset ->
             False
