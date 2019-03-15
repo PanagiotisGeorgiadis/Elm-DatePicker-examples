@@ -1,19 +1,14 @@
-module Main exposing (Flags, Model, Msg(..), init, main, subscriptions, update, view)
+module Main exposing (main)
 
 import Browser exposing (Document)
-import Browser.Navigation as Navigation
 import Clock
-import Components.DatePicker.Update as DatePicker
-import Components.DatePicker.View as DatePicker
-import Components.DateRangePicker.Update as DateRangePicker
-import Components.DateRangePicker.View as DateRangePicker
-import Components.TimePicker.Update as TimePicker
-import DateTime as DateTime
-import Html exposing (Html, br, div, hr, text)
+import DatePicker
+import DatePicker.Types exposing (DateLimit(..), ViewType(..))
+import DateTime exposing (DateTime)
+import Html exposing (Html, br, button, div, text)
 import Task
 import Time
-import Url exposing (Url)
-import Utils.Time as Time
+import TimePicker.Types as TimePicker
 
 
 type alias Flags =
@@ -21,269 +16,76 @@ type alias Flags =
 
 
 type alias Model =
-    { today : Maybe Time.Posix
-    , singleDatePicker : Maybe DatePicker.Model
-    , doubleDatePicker : Maybe DatePicker.Model
-
-    -- TODO: Implement those to just for completion
-    , singleDatePicker_C : Maybe DatePicker.Model
-    , doubleDatePicker_C : Maybe DatePicker.Model
-    , singleDateRangePicker : Maybe DateRangePicker.Model
-    , doubleDateRangePicker : Maybe DateRangePicker.Model
-    , singleDateRangePicker_C : Maybe DateRangePicker.Model
-    , doubleDateRangePicker_C : Maybe DateRangePicker.Model
+    { datePicker : Maybe DatePicker.Model
+    , selectedDateTime : Maybe DateTime
     }
 
 
 type Msg
-    = NoOp
-    | Initialise Time.Posix
-    | SingleDatePickerMsg DatePicker.Msg
-    | DoubleDatePickerMsg DatePicker.Msg
-      -- TODO: Implement those two just for completion
-    | SingleDatePickerMsg_C DatePicker.Msg
-    | DoubleDatePickerMsg_C DatePicker.Msg
-    | SingleDateRangeMsg DateRangePicker.Msg
-    | DoubleDateRangeMsg DateRangePicker.Msg
-    | SingleDateRangeMsg_C DateRangePicker.Msg
-    | DoubleDateRangeMsg_C DateRangePicker.Msg
-
-
-
-{-
-   Configs to add:
-   1) disablePastDates :: Bool    -- DONE.
-   2) showOnHover selection       -- DONE.
-   3) useKeyboardListeners ( Only on single date picker ? ) -- Think about that.
-   4) minDateRangeOffset :: Int -- Think about how to implement that. ( DONE )
-   5) futureDatesLimit :: DateLimit -- DONE
-   6) pastDatesLimit :: DateLimit   -- DONE
-   7) showHumanReadableDateString ?
-   8) humanReadableDateFormat ?
-        Example:
-            type DateFormat = US | EU
-   9) minAvailableDate.     ( DONE )
-   10) maxAvailableDate.    ( DONE )
-   11) availableDateRange -- We could combine the two properties above into a date range list.
-
-
-   Check the contenteditable if it can be implemented as a single line
-   only for the time picker.  ( NOPE )
-
-   Also check the start and end dates to always be sorted even if the user
-   selects the start date after the end date. ( DONE )
-
--}
-
-
-view : Model -> Document Msg
-view model =
-    { title = "My DatePicker"
-    , body =
-        [ div []
-            [ br [] []
-            , text "Single Date Picker"
-            , br [] []
-            , case model.singleDatePicker of
-                Just m ->
-                    Html.map SingleDatePickerMsg (DatePicker.view m)
-
-                Nothing ->
-                    text "Error!"
-            , br [] []
-            , br [] []
-            , br [] []
-            , text "Double Date Picker"
-            , br [] []
-            , case model.doubleDatePicker of
-                Just m ->
-                    Html.map DoubleDatePickerMsg (DatePicker.view m)
-
-                Nothing ->
-                    text "Error!"
-            , br [] []
-            , br [] []
-            , br [] []
-            , text "Single Date Picker Constrained"
-            , br [] []
-            , case model.singleDatePicker_C of
-                Just m ->
-                    Html.map SingleDatePickerMsg_C (DatePicker.view m)
-
-                Nothing ->
-                    text "Error!"
-            , br [] []
-            , br [] []
-            , br [] []
-            , text "Double Date Picker Constrained"
-            , br [] []
-            , case model.doubleDatePicker_C of
-                Just m ->
-                    Html.map DoubleDatePickerMsg_C (DatePicker.view m)
-
-                Nothing ->
-                    text "Error!"
-            , br [] []
-            , br [] []
-            , br [] []
-            , hr [] []
-            , br [] []
-            , text "Single Date Range Picker"
-            , br [] []
-            , case model.singleDateRangePicker of
-                Just datePickerModel ->
-                    Html.map SingleDateRangeMsg (DateRangePicker.view datePickerModel)
-
-                Nothing ->
-                    text "Error!"
-            , br [] []
-            , br [] []
-            , br [] []
-            , text "Double Date Range Picker"
-            , br [] []
-            , case model.doubleDateRangePicker of
-                Just datePickerModel ->
-                    Html.map DoubleDateRangeMsg (DateRangePicker.view datePickerModel)
-
-                Nothing ->
-                    text "Error!"
-            , br [] []
-            , br [] []
-            , br [] []
-            , text "Single Date Range Picker Constrained"
-            , br [] []
-            , case model.singleDateRangePicker_C of
-                Just datePickerModel ->
-                    Html.map SingleDateRangeMsg_C (DateRangePicker.view datePickerModel)
-
-                Nothing ->
-                    text "Error!"
-            , br [] []
-            , br [] []
-            , br [] []
-            , text "Double Date Range Picker Constrained"
-            , br [] []
-            , case model.doubleDateRangePicker_C of
-                Just datePickerModel ->
-                    Html.map DoubleDateRangeMsg_C (DateRangePicker.view datePickerModel)
-
-                Nothing ->
-                    text "Error!"
-            , br [] []
-            , br [] []
-            , br [] []
-            , br [] []
-            , br [] []
-            ]
-        ]
-    }
+    = Initialise Time.Posix
+    | DatePickerMsg DatePicker.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
-            ( model
-            , Cmd.none
-            )
-
-        Initialise todayPosix ->
+        Initialise today ->
             let
-                todayDateTime =
-                    DateTime.fromPosix todayPosix
-
-                ( thirdOfFeb, sixteenOfApr ) =
-                    ( Time.millisToPosix 1549152000000
-                    , Time.millisToPosix 1555372800000
+                ( date1, date2 ) =
+                    ( DateTime.fromRawParts
+                        { day = 1, month = Time.Jan, year = 2019 }
+                        { hours = 0, minutes = 0, seconds = 0, milliseconds = 0 }
+                    , DateTime.fromRawParts
+                        { day = 31, month = Time.Dec, year = 2019 }
+                        { hours = 0, minutes = 0, seconds = 0, milliseconds = 0 }
                     )
 
-                constrains =
-                    { minDate = DateTime.fromPosix thirdOfFeb
-                    , maxDate = DateTime.fromPosix sixteenOfApr
-                    }
+                calendarConfig =
+                    { today = DateTime.fromPosix today
+                    , primaryDate = Nothing
+                    , dateLimit =
+                        case ( date1, date2 ) of
+                            ( Just d1, Just d2 ) ->
+                                DateLimit { minDate = d1, maxDate = d2 }
 
-                defaultTime =
-                    Maybe.withDefault
-                        Clock.midnight
-                        (Clock.fromRawParts { hours = 11, minutes = 11, seconds = 11, milliseconds = 0 })
+                            _ ->
+                                NoLimit { disablePastDates = False }
+                    }
 
                 timePickerConfig =
                     Just
-                        { pickerType = TimePicker.HH_MM_SS { hoursStep = 1, minutesStep = 5, secondsStep = 10 }
-                        , defaultTime = defaultTime
-                        , pickerTitle = "Pick-up Time"
-                        }
-
-                timePickerConfig_Range =
-                    Just
                         { pickerType = TimePicker.HH_MM { hoursStep = 1, minutesStep = 5 }
-                        , defaultTime = defaultTime
-                        , pickerTitles = { start = "Pick-up Time", end = "Drop-off Time" }
-                        , mirrorTimes = True
+                        , defaultTime = Clock.midnight
+                        , pickerTitle = "Date Time"
                         }
-
-                getDatePickerConfig dateLimit =
-                    { today = todayDateTime
-                    , primaryDate = todayDateTime
-                    , dateLimit = dateLimit
-                    }
-
-                getDateRangeConfig dateLimit dateRangeOffset =
-                    { today = todayDateTime
-                    , primaryDate = todayDateTime
-                    , dateLimit = dateLimit
-                    , dateRangeOffset = dateRangeOffset
-                    }
-
-                datePickerConfig =
-                    getDatePickerConfig (DatePicker.NoLimit { disablePastDates = True })
-
-                datePickerConfig_C =
-                    getDatePickerConfig (DatePicker.DateLimit constrains)
-
-                dateRangeConfig =
-                    getDateRangeConfig (DateRangePicker.NoLimit { disablePastDates = True }) (Just { minDateRangeLength = 7 })
-
-                dateRangeConfig_C =
-                    getDateRangeConfig (DateRangePicker.DateLimit constrains) (Just { minDateRangeLength = 4 })
             in
             ( { model
-                | today = Just todayPosix
-
-                --
-                , singleDatePicker = Just (DatePicker.initialise DatePicker.Single datePickerConfig timePickerConfig)
-                , doubleDatePicker = Just (DatePicker.initialise DatePicker.Double datePickerConfig timePickerConfig)
-                , singleDatePicker_C = Just (DatePicker.initialise DatePicker.Single datePickerConfig_C timePickerConfig)
-                , doubleDatePicker_C = Just (DatePicker.initialise DatePicker.Double datePickerConfig_C timePickerConfig)
-
-                --
-                , singleDateRangePicker = Just (DateRangePicker.initialise DateRangePicker.Single dateRangeConfig timePickerConfig_Range)
-                , doubleDateRangePicker = Just (DateRangePicker.initialise DateRangePicker.Double dateRangeConfig timePickerConfig_Range)
-                , singleDateRangePicker_C = Just (DateRangePicker.initialise DateRangePicker.Single dateRangeConfig_C timePickerConfig_Range)
-                , doubleDateRangePicker_C = Just (DateRangePicker.initialise DateRangePicker.Double dateRangeConfig_C timePickerConfig_Range)
+                | datePicker =
+                    Just (DatePicker.initialise Single calendarConfig timePickerConfig)
               }
             , Cmd.none
             )
 
-        SingleDatePickerMsg subMsg ->
-            case model.singleDatePicker of
-                Just datePickerModel ->
+        DatePickerMsg subMsg ->
+            case model.datePicker of
+                Just datePicker ->
                     let
                         ( subModel, subCmd, extMsg ) =
-                            DatePicker.update subMsg datePickerModel
+                            DatePicker.update subMsg datePicker
 
-                        -- Example on how to get the selected date
-                        -- out of the DatePicker module.
-                        selectedDate =
+                        selectedDateTime =
                             case extMsg of
-                                DatePicker.DateSelected date ->
-                                    date
+                                DatePicker.DateSelected dateTime ->
+                                    dateTime
 
                                 DatePicker.None ->
-                                    Nothing
+                                    model.selectedDateTime
                     in
-                    ( { model | singleDatePicker = Just subModel }
-                    , Cmd.map SingleDatePickerMsg subCmd
+                    ( { model
+                        | datePicker = Just subModel
+                        , selectedDateTime = selectedDateTime
+                      }
+                    , Cmd.map DatePickerMsg subCmd
                     )
 
                 Nothing ->
@@ -291,204 +93,142 @@ update msg model =
                     , Cmd.none
                     )
 
-        DoubleDatePickerMsg subMsg ->
-            case model.doubleDatePicker of
-                Just datePickerModel ->
-                    let
-                        ( subModel, subCmd, extMsg ) =
-                            DatePicker.update subMsg datePickerModel
 
-                        -- Example on how to get the selected date
-                        -- out of the DatePicker module.
-                        selectedDate =
-                            case extMsg of
-                                DatePicker.DateSelected date ->
-                                    date
-
-                                DatePicker.None ->
-                                    Nothing
-                    in
-                    ( { model | doubleDatePicker = Just subModel }
-                    , Cmd.map DoubleDatePickerMsg subCmd
-                    )
+view : Model -> Document Msg
+view model =
+    { title = "DatePicker example"
+    , body =
+        [ div []
+            [ case model.datePicker of
+                Just datePicker ->
+                    Html.map DatePickerMsg (DatePicker.view datePicker)
 
                 Nothing ->
-                    ( model
-                    , Cmd.none
-                    )
+                    text ""
+            ]
+        , br [] []
+        , br [] []
+        , br [] []
+        , text "Selected DateTime"
+        , br [] []
+        , text (toHumanReadableString model.selectedDateTime)
+        ]
+    }
 
-        SingleDatePickerMsg_C subMsg ->
-            case model.singleDatePicker_C of
-                Just datePickerModel ->
-                    let
-                        ( subModel, subCmd, extMsg ) =
-                            DatePicker.update subMsg datePickerModel
 
-                        -- Example on how to get the selected date
-                        -- out of the DatePicker module.
-                        selectedDate =
-                            case extMsg of
-                                DatePicker.DateSelected date ->
-                                    date
+toHumanReadableString : Maybe DateTime -> String
+toHumanReadableString dateTime =
+    case dateTime of
+        Just dt ->
+            String.join " "
+                [ String.join " "
+                    [ weekdayToString (DateTime.getWeekday dt)
+                    , String.fromInt (DateTime.getDay dt)
+                    , monthToString (DateTime.getMonth dt)
+                    , String.fromInt (DateTime.getYear dt)
+                    ]
+                , String.join ":"
+                    [ formatTime (DateTime.getHours dt)
+                    , formatTime (DateTime.getMinutes dt)
+                    , formatTime (DateTime.getSeconds dt)
+                    , formatMillis (DateTime.getMilliseconds dt)
+                    ]
+                ]
 
-                                DatePicker.None ->
-                                    Nothing
-                    in
-                    ( { model | singleDatePicker_C = Just subModel }
-                    , Cmd.map SingleDatePickerMsg_C subCmd
-                    )
+        Nothing ->
+            "Nothing"
 
-                Nothing ->
-                    ( model
-                    , Cmd.none
-                    )
 
-        DoubleDatePickerMsg_C subMsg ->
-            case model.doubleDatePicker_C of
-                Just datePickerModel ->
-                    let
-                        ( subModel, subCmd, extMsg ) =
-                            DatePicker.update subMsg datePickerModel
+formatTime : Int -> String
+formatTime time =
+    if time < 10 then
+        "0" ++ String.fromInt time
 
-                        -- Example on how to get the selected date
-                        -- out of the DatePicker module.
-                        selectedDate =
-                            case extMsg of
-                                DatePicker.DateSelected date ->
-                                    date
+    else
+        String.fromInt time
 
-                                DatePicker.None ->
-                                    Nothing
-                    in
-                    ( { model | doubleDatePicker_C = Just subModel }
-                    , Cmd.map DoubleDatePickerMsg_C subCmd
-                    )
 
-                Nothing ->
-                    ( model
-                    , Cmd.none
-                    )
+formatMillis : Int -> String
+formatMillis millis =
+    if millis < 10 then
+        "00" ++ String.fromInt millis
 
-        SingleDateRangeMsg subMsg ->
-            case model.singleDateRangePicker of
-                Just datePickerModel ->
-                    let
-                        ( subModel, subCmd, extMsg ) =
-                            DateRangePicker.update subMsg datePickerModel
+    else if millis < 100 then
+        "0" ++ String.fromInt millis
 
-                        -- Example on how to get the selected date range
-                        -- out of the DateRangePicker module.
-                        selectedDateRange =
-                            case extMsg of
-                                DateRangePicker.DateRangeSelected date ->
-                                    date
+    else
+        String.fromInt millis
 
-                                DateRangePicker.None ->
-                                    Nothing
-                    in
-                    ( { model | singleDateRangePicker = Just subModel }
-                    , Cmd.map SingleDateRangeMsg subCmd
-                    )
 
-                Nothing ->
-                    ( model
-                    , Cmd.none
-                    )
+weekdayToString : Time.Weekday -> String
+weekdayToString weekday =
+    case weekday of
+        Time.Mon ->
+            "Monday"
 
-        DoubleDateRangeMsg subMsg ->
-            case model.doubleDateRangePicker of
-                Just datePickerModel ->
-                    let
-                        ( subModel, subCmd, extMsg ) =
-                            DateRangePicker.update subMsg datePickerModel
+        Time.Tue ->
+            "Tuesday"
 
-                        -- Example on how to get the selected date range
-                        -- out of the DateRangePicker module.
-                        selectedDateRange =
-                            case extMsg of
-                                DateRangePicker.DateRangeSelected date ->
-                                    date
+        Time.Wed ->
+            "Wednesday"
 
-                                DateRangePicker.None ->
-                                    Nothing
-                    in
-                    ( { model | doubleDateRangePicker = Just subModel }
-                    , Cmd.map DoubleDateRangeMsg subCmd
-                    )
+        Time.Thu ->
+            "Thursday"
 
-                Nothing ->
-                    ( model
-                    , Cmd.none
-                    )
+        Time.Fri ->
+            "Friday"
 
-        SingleDateRangeMsg_C subMsg ->
-            case model.singleDateRangePicker_C of
-                Just datePickerModel ->
-                    let
-                        ( subModel, subCmd, extMsg ) =
-                            DateRangePicker.update subMsg datePickerModel
+        Time.Sat ->
+            "Saturday"
 
-                        -- Example on how to get the selected date range
-                        -- out of the DateRangePicker module.
-                        selectedDateRange =
-                            case extMsg of
-                                DateRangePicker.DateRangeSelected date ->
-                                    date
+        Time.Sun ->
+            "Sunday"
 
-                                DateRangePicker.None ->
-                                    Nothing
-                    in
-                    ( { model | singleDateRangePicker_C = Just subModel }
-                    , Cmd.map SingleDateRangeMsg_C subCmd
-                    )
 
-                Nothing ->
-                    ( model
-                    , Cmd.none
-                    )
+monthToString : Time.Month -> String
+monthToString month =
+    case month of
+        Time.Jan ->
+            "January"
 
-        DoubleDateRangeMsg_C subMsg ->
-            case model.doubleDateRangePicker_C of
-                Just datePickerModel ->
-                    let
-                        ( subModel, subCmd, extMsg ) =
-                            DateRangePicker.update subMsg datePickerModel
+        Time.Feb ->
+            "February"
 
-                        -- Example on how to get the selected date range
-                        -- out of the DateRangePicker module.
-                        selectedDateRange =
-                            case extMsg of
-                                DateRangePicker.DateRangeSelected date ->
-                                    date
+        Time.Mar ->
+            "March"
 
-                                DateRangePicker.None ->
-                                    Nothing
-                    in
-                    ( { model | doubleDateRangePicker_C = Just subModel }
-                    , Cmd.map DoubleDateRangeMsg_C subCmd
-                    )
+        Time.Apr ->
+            "April"
 
-                Nothing ->
-                    ( model
-                    , Cmd.none
-                    )
+        Time.May ->
+            "May"
+
+        Time.Jun ->
+            "June"
+
+        Time.Jul ->
+            "July"
+
+        Time.Aug ->
+            "August"
+
+        Time.Sep ->
+            "September"
+
+        Time.Oct ->
+            "October"
+
+        Time.Nov ->
+            "November"
+
+        Time.Dec ->
+            "December"
 
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { today = Nothing
-
-      --
-      , singleDatePicker = Nothing
-      , doubleDatePicker = Nothing
-      , singleDatePicker_C = Nothing
-      , doubleDatePicker_C = Nothing
-
-      --
-      , singleDateRangePicker = Nothing
-      , doubleDateRangePicker = Nothing
-      , singleDateRangePicker_C = Nothing
-      , doubleDateRangePicker_C = Nothing
+    ( { datePicker = Nothing
+      , selectedDateTime = Nothing
       }
     , Task.perform Initialise Time.now
     )
@@ -500,10 +240,5 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = subscriptions
+        , subscriptions = \_ -> Sub.none
         }
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
