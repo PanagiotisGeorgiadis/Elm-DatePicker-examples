@@ -4,7 +4,8 @@ import Browser exposing (Document)
 import Components.Double.DatePicker as DoubleDatePicker
 import Components.Single.DatePicker as SingleDatePicker
 import Components.Single.DateTimePicker as SingleDateTimePicker
-import Html exposing (Html, br, text)
+import Html exposing (Html, br, div, text)
+import Html.Attributes exposing (class)
 import Task
 import Time
 
@@ -98,24 +99,26 @@ view : Model -> Document Msg
 view model =
     { title = "DatePickers example"
     , body =
-        [ case model.singleDatePicker of
-            Just datePicker ->
-                Html.map SingleDatePickerMsg (SingleDatePicker.view datePicker)
+        [ div [ class "page" ]
+            [ case model.singleDatePicker of
+                Just datePicker ->
+                    Html.map SingleDatePickerMsg (SingleDatePicker.view datePicker)
 
-            Nothing ->
-                text "Single date picker hasn't been initialised!"
-        , case model.singleDateTimePicker of
-            Just datePicker ->
-                Html.map SingleDateTimePickerMsg (SingleDateTimePicker.view datePicker)
+                Nothing ->
+                    text "Single date picker hasn't been initialised!"
+            , case model.singleDateTimePicker of
+                Just datePicker ->
+                    Html.map SingleDateTimePickerMsg (SingleDateTimePicker.view datePicker)
 
-            Nothing ->
-                text "Single date time picker hasn't been initialised!"
-        , case model.doubleDatePicker of
-            Just datePicker ->
-                Html.map DoubleDatePickerMsg (DoubleDatePicker.view datePicker)
+                Nothing ->
+                    text "Single date time picker hasn't been initialised!"
+            , case model.doubleDatePicker of
+                Just datePicker ->
+                    Html.map DoubleDatePickerMsg (DoubleDatePicker.view datePicker)
 
-            Nothing ->
-                text "Double date picker hasn't been initialised!"
+                Nothing ->
+                    text "Double date picker hasn't been initialised!"
+            ]
         ]
     }
 

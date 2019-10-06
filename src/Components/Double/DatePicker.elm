@@ -89,7 +89,7 @@ update msg model =
 
 view : Model -> Html Msg
 view { datePicker, selectedDateTime } =
-    div [ class "example-section" ]
+    div [ class "section" ]
         [ h3 [] [ text "Single Date Picker" ]
         , Html.map DatePickerMsg (DatePicker.view datePicker)
         , br [] []
