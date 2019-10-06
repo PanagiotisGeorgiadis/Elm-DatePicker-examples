@@ -1,4 +1,4 @@
-module Components.Double.DatePicker exposing
+module Components.Double.DateTimePicker exposing
     ( Model
     , Msg
     , init
@@ -6,6 +6,7 @@ module Components.Double.DatePicker exposing
     , view
     )
 
+import Clock
 import DatePicker
 import DatePicker.Types exposing (DateLimit(..), ViewType(..))
 import DateTime exposing (DateTime)
@@ -13,6 +14,7 @@ import Extra.DateTime as DateTimeExtra
 import Html exposing (Html, br, div, h3, span, text)
 import Html.Attributes exposing (class)
 import Time exposing (Posix)
+import TimePicker.Types as TimePicker
 
 
 type alias Model =
@@ -43,9 +45,12 @@ init todayPosix =
             , dateLimit = DateLimit { minDate = minDate, maxDate = maxDate }
             }
 
-        -- The `timePickerConfig` is set to `Nothing` cause we don't want one.
         timePickerConfig =
-            Nothing
+            Just
+                { pickerType = TimePicker.HH_MM { hoursStep = 1, minutesStep = 5 }
+                , defaultTime = Clock.midnight
+                , pickerTitle = "Select Time"
+                }
     in
     { datePicker =
         DatePicker.initialise Double calendarConfig timePickerConfig
@@ -90,7 +95,7 @@ update msg model =
 view : Model -> Html Msg
 view { datePicker, selectedDateTime } =
     div [ class "section" ]
-        [ h3 [] [ text "Double Date Picker" ]
+        [ h3 [] [ text "Double Date-Time Picker" ]
         , Html.map DatePickerMsg (DatePicker.view datePicker)
         , br [] []
         , case selectedDateTime of

@@ -49,7 +49,7 @@ init todayPosix =
             Just
                 { pickerType = TimePicker.HH_MM { hoursStep = 1, minutesStep = 5 }
                 , defaultTime = Clock.midnight
-                , pickerTitle = "Date Time"
+                , pickerTitle = "Select Time"
                 }
     in
     { datePicker =
