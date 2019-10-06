@@ -20,3 +20,8 @@ body {
 .page > .section > .footer > .date {
     margin-left: 8px;
 }
+
+.page > .section > .footer > .separator {
+    margin-left: 8px;
+    font-weight: bold;
+}
