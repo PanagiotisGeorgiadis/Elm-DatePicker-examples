@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Browser exposing (Document)
 import Components.Double.DatePicker as DoubleDatePicker
+import Components.Double.DateRangePicker as DoubleDateRangePicker
 import Components.Double.DateTimePicker as DoubleDateTimePicker
 import Components.Single.DatePicker as SingleDatePicker
 import Components.Single.DateRangePicker as SingleDateRangePicker
@@ -21,9 +22,10 @@ type alias Model =
     , singleDateTimePicker : Maybe SingleDateTimePicker.Model
     , singleDateRangePicker : Maybe SingleDateRangePicker.Model
 
-    -- Separating `Single` from `Double`
+    --
     , doubleDatePicker : Maybe DoubleDatePicker.Model
     , doubleDateTimePicker : Maybe DoubleDateTimePicker.Model
+    , doubleDateRangePicker : Maybe DoubleDateRangePicker.Model
     }
 
 
@@ -32,8 +34,10 @@ type Msg
     | SingleDatePickerMsg SingleDatePicker.Msg
     | SingleDateTimePickerMsg SingleDateTimePicker.Msg
     | SingleDateRangePickerMsg SingleDateRangePicker.Msg
+      --
     | DoubleDatePickerMsg DoubleDatePicker.Msg
     | DoubleDateTimePickerMsg DoubleDateTimePicker.Msg
+    | DoubleDateRangePickerMsg DoubleDateRangePicker.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -44,8 +48,11 @@ update msg model =
                 | singleDatePicker = Just (SingleDatePicker.init todayPosix)
                 , singleDateTimePicker = Just (SingleDateTimePicker.init todayPosix)
                 , singleDateRangePicker = Just (SingleDateRangePicker.init todayPosix)
+
+                --
                 , doubleDatePicker = Just (DoubleDatePicker.init todayPosix)
                 , doubleDateTimePicker = Just (DoubleDateTimePicker.init todayPosix)
+                , doubleDateRangePicker = Just (DoubleDateRangePicker.init todayPosix)
               }
             , Cmd.none
             )
@@ -140,6 +147,24 @@ update msg model =
                     , Cmd.none
                     )
 
+        DoubleDateRangePickerMsg subMsg ->
+            case model.doubleDateRangePicker of
+                Just picker ->
+                    let
+                        ( subModel, subCmd ) =
+                            DoubleDateRangePicker.update subMsg picker
+                    in
+                    ( { model
+                        | doubleDateRangePicker = Just subModel
+                      }
+                    , Cmd.map DoubleDateRangePickerMsg subCmd
+                    )
+
+                Nothing ->
+                    ( model
+                    , Cmd.none
+                    )
+
 
 view : Model -> Document Msg
 view model =
@@ -176,6 +201,12 @@ view model =
 
                 Nothing ->
                     text "Double date time picker hasn't been initialised!"
+            , case model.doubleDateRangePicker of
+                Just picker ->
+                    Html.map DoubleDateRangePickerMsg (DoubleDateRangePicker.view picker)
+
+                Nothing ->
+                    text "Double date range picker hasn't been initialised!"
             ]
         ]
     }
@@ -186,8 +217,11 @@ init flags =
     ( { singleDatePicker = Nothing
       , singleDateTimePicker = Nothing
       , singleDateRangePicker = Nothing
+
+      --
       , doubleDatePicker = Nothing
       , doubleDateTimePicker = Nothing
+      , doubleDateRangePicker = Nothing
       }
     , Task.perform Initialise Time.now
     )
