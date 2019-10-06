@@ -5,6 +5,7 @@ import Clock
 import DatePicker
 import DatePicker.Types exposing (DateLimit(..), ViewType(..))
 import DateTime exposing (DateTime)
+import Extra.DateTime as DateTimeExtra
 import Html exposing (Html, br, button, div, text)
 import Task
 import Time
@@ -111,115 +112,9 @@ view model =
         , br [] []
         , text "Selected DateTime"
         , br [] []
-        , text (toHumanReadableString model.selectedDateTime)
+        , text (DateTimeExtra.toString model.selectedDateTime)
         ]
     }
-
-
-toHumanReadableString : Maybe DateTime -> String
-toHumanReadableString dateTime =
-    case dateTime of
-        Just dt ->
-            String.join " "
-                [ String.join " "
-                    [ weekdayToString (DateTime.getWeekday dt)
-                    , String.fromInt (DateTime.getDay dt)
-                    , monthToString (DateTime.getMonth dt)
-                    , String.fromInt (DateTime.getYear dt)
-                    ]
-                , String.join ":"
-                    [ formatTime (DateTime.getHours dt)
-                    , formatTime (DateTime.getMinutes dt)
-                    , formatTime (DateTime.getSeconds dt)
-                    , formatMillis (DateTime.getMilliseconds dt)
-                    ]
-                ]
-
-        Nothing ->
-            "Nothing"
-
-
-formatTime : Int -> String
-formatTime time =
-    if time < 10 then
-        "0" ++ String.fromInt time
-    else
-        String.fromInt time
-
-
-formatMillis : Int -> String
-formatMillis millis =
-    if millis < 10 then
-        "00" ++ String.fromInt millis
-    else if millis < 100 then
-        "0" ++ String.fromInt millis
-    else
-        String.fromInt millis
-
-
-weekdayToString : Time.Weekday -> String
-weekdayToString weekday =
-    case weekday of
-        Time.Mon ->
-            "Monday"
-
-        Time.Tue ->
-            "Tuesday"
-
-        Time.Wed ->
-            "Wednesday"
-
-        Time.Thu ->
-            "Thursday"
-
-        Time.Fri ->
-            "Friday"
-
-        Time.Sat ->
-            "Saturday"
-
-        Time.Sun ->
-            "Sunday"
-
-
-monthToString : Time.Month -> String
-monthToString month =
-    case month of
-        Time.Jan ->
-            "January"
-
-        Time.Feb ->
-            "February"
-
-        Time.Mar ->
-            "March"
-
-        Time.Apr ->
-            "April"
-
-        Time.May ->
-            "May"
-
-        Time.Jun ->
-            "June"
-
-        Time.Jul ->
-            "July"
-
-        Time.Aug ->
-            "August"
-
-        Time.Sep ->
-            "September"
-
-        Time.Oct ->
-            "October"
-
-        Time.Nov ->
-            "November"
-
-        Time.Dec ->
-            "December"
 
 
 init : Flags -> ( Model, Cmd Msg )
