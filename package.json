@@ -14,7 +14,7 @@
   "author": "Panagiotis Georgiadis",
   "license": "ISC",
   "dependencies": {
-    "elm": "^0.19.0-bugfix2"
+    "elm": "^0.19.0-no-deps"
   },
   "devDependencies": {
     "express": "^4.16.4",
