@@ -3,6 +3,7 @@ module Main exposing (main)
 import Browser exposing (Document)
 import Components.Double.DatePicker as DoubleDatePicker
 import Components.Single.DatePicker as SingleDatePicker
+import Components.Single.DateTimePicker as SingleDateTimePicker
 import Html exposing (Html, br, text)
 import Task
 import Time
@@ -14,6 +15,7 @@ type alias Flags =
 
 type alias Model =
     { singleDatePicker : Maybe SingleDatePicker.Model
+    , singleDateTimePicker : Maybe SingleDateTimePicker.Model
     , doubleDatePicker : Maybe DoubleDatePicker.Model
     }
 
@@ -21,6 +23,7 @@ type alias Model =
 type Msg
     = Initialise Time.Posix
     | SingleDatePickerMsg SingleDatePicker.Msg
+    | SingleDateTimePickerMsg SingleDateTimePicker.Msg
     | DoubleDatePickerMsg DoubleDatePicker.Msg
 
 
@@ -30,6 +33,7 @@ update msg model =
         Initialise todayPosix ->
             ( { model
                 | singleDatePicker = Just (SingleDatePicker.init todayPosix)
+                , singleDateTimePicker = Just (SingleDateTimePicker.init todayPosix)
                 , doubleDatePicker = Just (DoubleDatePicker.init todayPosix)
               }
             , Cmd.none
@@ -46,6 +50,24 @@ update msg model =
                         | singleDatePicker = Just subModel
                       }
                     , Cmd.map SingleDatePickerMsg subCmd
+                    )
+
+                Nothing ->
+                    ( model
+                    , Cmd.none
+                    )
+
+        SingleDateTimePickerMsg subMsg ->
+            case model.singleDateTimePicker of
+                Just datePicker ->
+                    let
+                        ( subModel, subCmd ) =
+                            SingleDateTimePicker.update subMsg datePicker
+                    in
+                    ( { model
+                        | singleDateTimePicker = Just subModel
+                      }
+                    , Cmd.map SingleDateTimePickerMsg subCmd
                     )
 
                 Nothing ->
@@ -82,6 +104,12 @@ view model =
 
             Nothing ->
                 text "Single date picker hasn't been initialised!"
+        , case model.singleDateTimePicker of
+            Just datePicker ->
+                Html.map SingleDateTimePickerMsg (SingleDateTimePicker.view datePicker)
+
+            Nothing ->
+                text "Single date time picker hasn't been initialised!"
         , case model.doubleDatePicker of
             Just datePicker ->
                 Html.map DoubleDatePickerMsg (DoubleDatePicker.view datePicker)
@@ -95,6 +123,7 @@ view model =
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { singleDatePicker = Nothing
+      , singleDateTimePicker = Nothing
       , doubleDatePicker = Nothing
       }
     , Task.perform Initialise Time.now
