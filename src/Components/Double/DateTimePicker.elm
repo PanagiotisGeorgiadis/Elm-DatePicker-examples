@@ -18,7 +18,7 @@ import TimePicker.Types as TimePicker
 
 
 type alias Model =
-    { datePicker : DatePicker.Model
+    { picker : DatePicker.Model
     , selectedDateTime : Maybe DateTime
     }
 
@@ -52,15 +52,14 @@ init todayPosix =
                 , pickerTitle = "Select Time"
                 }
     in
-    { datePicker =
-        DatePicker.initialise Double calendarConfig timePickerConfig
+    { picker = DatePicker.initialise Double calendarConfig timePickerConfig
     , selectedDateTime = Nothing
     }
 
 
 type Msg
     = NoOp
-    | DatePickerMsg DatePicker.Msg
+    | PickerMsg DatePicker.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -71,10 +70,10 @@ update msg model =
             , Cmd.none
             )
 
-        DatePickerMsg subMsg ->
+        PickerMsg subMsg ->
             let
                 ( updated, subCmd, extMsg ) =
-                    DatePicker.update subMsg model.datePicker
+                    DatePicker.update subMsg model.picker
 
                 selectedDateTime =
                     case extMsg of
@@ -85,18 +84,18 @@ update msg model =
                             dateTime
             in
             ( { model
-                | datePicker = updated
+                | picker = updated
                 , selectedDateTime = selectedDateTime
               }
-            , Cmd.map DatePickerMsg subCmd
+            , Cmd.map PickerMsg subCmd
             )
 
 
 view : Model -> Html Msg
-view { datePicker, selectedDateTime } =
+view { picker, selectedDateTime } =
     div [ class "section" ]
         [ h3 [] [ text "Double Date-Time Picker" ]
-        , Html.map DatePickerMsg (DatePicker.view datePicker)
+        , Html.map PickerMsg (DatePicker.view picker)
         , br [] []
         , case selectedDateTime of
             Just sdt ->
