@@ -1,4 +1,4 @@
-module Components.DoubleDatePicker exposing
+module Components.Single.DatePicker exposing
     ( Model
     , Msg
     , init
@@ -48,7 +48,7 @@ init todayPosix =
             Nothing
     in
     { datePicker =
-        DatePicker.initialise Double calendarConfig timePickerConfig
+        DatePicker.initialise Single calendarConfig timePickerConfig
     , selectedDateTime = Nothing
     }
 

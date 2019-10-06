@@ -1,8 +1,8 @@
 module Main exposing (main)
 
 import Browser exposing (Document)
-import Components.DoubleDatePicker as DoubleDatePicker
-import Components.SingleDatePicker as SingleDatePicker
+import Components.Double.DatePicker as DoubleDatePicker
+import Components.Single.DatePicker as SingleDatePicker
 import Html exposing (Html, br, text)
 import Task
 import Time
