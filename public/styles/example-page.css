@@ -3,3 +3,20 @@ body {
     padding: 0;
     font-family: 'Roboto', sans-serif;
 }
+
+.example-section {
+    padding: 24px;
+    border-bottom: 2px solid lightgray;
+}
+
+.example-section h3 {
+    margin-top: 0;
+}
+
+.example-section > .footer > .text {
+    font-weight: bold;
+}
+
+.example-section > .footer > .date {
+    margin-left: 8px;
+}
