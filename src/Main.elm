@@ -52,10 +52,10 @@ update msg model =
 
         SingleDatePickerMsg subMsg ->
             case model.singleDatePicker of
-                Just datePicker ->
+                Just picker ->
                     let
                         ( subModel, subCmd ) =
-                            SingleDatePicker.update subMsg datePicker
+                            SingleDatePicker.update subMsg picker
                     in
                     ( { model
                         | singleDatePicker = Just subModel
@@ -70,10 +70,10 @@ update msg model =
 
         SingleDateTimePickerMsg subMsg ->
             case model.singleDateTimePicker of
-                Just dateTimePicker ->
+                Just picker ->
                     let
                         ( subModel, subCmd ) =
-                            SingleDateTimePicker.update subMsg dateTimePicker
+                            SingleDateTimePicker.update subMsg picker
                     in
                     ( { model
                         | singleDateTimePicker = Just subModel
@@ -88,10 +88,10 @@ update msg model =
 
         SingleDateRangePickerMsg subMsg ->
             case model.singleDateRangePicker of
-                Just dateRangePicker ->
+                Just picker ->
                     let
                         ( subModel, subCmd ) =
-                            SingleDateRangePicker.update subMsg dateRangePicker
+                            SingleDateRangePicker.update subMsg picker
                     in
                     ( { model
                         | singleDateRangePicker = Just subModel
@@ -106,10 +106,10 @@ update msg model =
 
         DoubleDatePickerMsg subMsg ->
             case model.doubleDatePicker of
-                Just datePicker ->
+                Just picker ->
                     let
                         ( subModel, subCmd ) =
-                            DoubleDatePicker.update subMsg datePicker
+                            DoubleDatePicker.update subMsg picker
                     in
                     ( { model
                         | doubleDatePicker = Just subModel
@@ -124,10 +124,10 @@ update msg model =
 
         DoubleDateTimePickerMsg subMsg ->
             case model.doubleDateTimePicker of
-                Just dateTimePicker ->
+                Just picker ->
                     let
                         ( subModel, subCmd ) =
-                            DoubleDateTimePicker.update subMsg dateTimePicker
+                            DoubleDateTimePicker.update subMsg picker
                     in
                     ( { model
                         | doubleDateTimePicker = Just subModel
@@ -147,32 +147,32 @@ view model =
     , body =
         [ div [ class "page" ]
             [ case model.singleDatePicker of
-                Just datePicker ->
-                    Html.map SingleDatePickerMsg (SingleDatePicker.view datePicker)
+                Just picker ->
+                    Html.map SingleDatePickerMsg (SingleDatePicker.view picker)
 
                 Nothing ->
                     text "Single date picker hasn't been initialised!"
             , case model.singleDateTimePicker of
-                Just dateTimePicker ->
-                    Html.map SingleDateTimePickerMsg (SingleDateTimePicker.view dateTimePicker)
+                Just picker ->
+                    Html.map SingleDateTimePickerMsg (SingleDateTimePicker.view picker)
 
                 Nothing ->
                     text "Single date time picker hasn't been initialised!"
             , case model.singleDateRangePicker of
-                Just dateRangePicker ->
-                    Html.map SingleDateRangePickerMsg (SingleDateRangePicker.view dateRangePicker)
+                Just picker ->
+                    Html.map SingleDateRangePickerMsg (SingleDateRangePicker.view picker)
 
                 Nothing ->
                     text "Single date range picker hasn't been initialised!"
             , case model.doubleDatePicker of
-                Just datePicker ->
-                    Html.map DoubleDatePickerMsg (DoubleDatePicker.view datePicker)
+                Just picker ->
+                    Html.map DoubleDatePickerMsg (DoubleDatePicker.view picker)
 
                 Nothing ->
                     text "Double date picker hasn't been initialised!"
             , case model.doubleDateTimePicker of
-                Just dateTimePicker ->
-                    Html.map DoubleDateTimePickerMsg (DoubleDateTimePicker.view dateTimePicker)
+                Just picker ->
+                    Html.map DoubleDateTimePickerMsg (DoubleDateTimePicker.view picker)
 
                 Nothing ->
                     text "Double date time picker hasn't been initialised!"

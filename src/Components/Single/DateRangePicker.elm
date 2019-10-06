@@ -48,18 +48,12 @@ init todayPosix =
 
 
 type Msg
-    = NoOp
-    | PickerMsg DateRangePicker.Msg
+    = PickerMsg DateRangePicker.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
-            ( model
-            , Cmd.none
-            )
-
         PickerMsg subMsg ->
             let
                 ( updated, subCmd, extMsg ) =
