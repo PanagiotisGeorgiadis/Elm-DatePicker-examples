@@ -1,4 +1,4 @@
-module Components.DatePicker exposing
+module Components.SingleDatePicker exposing
     ( Model
     , Msg
     , init
