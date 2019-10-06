@@ -1,31 +1,30 @@
-module Extra.DateTime exposing (toString)
+module Extra.DateTime exposing
+    ( decrementDays
+    , incrementDays
+    , toString
+    )
 
 import DateTime exposing (DateTime)
 import Extra.Time.Month as MonthExtra
 import Extra.Time.Weekday as WeekdayExtra
 
 
-toString : Maybe DateTime -> String
+toString : DateTime -> String
 toString dateTime =
-    case dateTime of
-        Just dt ->
-            String.join " "
-                [ String.join " "
-                    [ WeekdayExtra.toString (DateTime.getWeekday dt)
-                    , String.fromInt (DateTime.getDay dt)
-                    , MonthExtra.toString (DateTime.getMonth dt)
-                    , String.fromInt (DateTime.getYear dt)
-                    ]
-                , String.join ":"
-                    [ formatTime (DateTime.getHours dt)
-                    , formatTime (DateTime.getMinutes dt)
-                    , formatTime (DateTime.getSeconds dt)
-                    , formatMillis (DateTime.getMilliseconds dt)
-                    ]
-                ]
-
-        Nothing ->
-            "Nothing"
+    String.join " "
+        [ String.join " "
+            [ WeekdayExtra.toString (DateTime.getWeekday dateTime)
+            , String.fromInt (DateTime.getDay dateTime)
+            , MonthExtra.toString (DateTime.getMonth dateTime)
+            , String.fromInt (DateTime.getYear dateTime)
+            ]
+        , String.join ":"
+            [ formatTime (DateTime.getHours dateTime)
+            , formatTime (DateTime.getMinutes dateTime)
+            , formatTime (DateTime.getSeconds dateTime)
+            , formatMillis (DateTime.getMilliseconds dateTime) ++ "Z"
+            ]
+        ]
 
 
 formatTime : Int -> String
@@ -47,3 +46,21 @@ formatMillis millis =
 
     else
         String.fromInt millis
+
+
+incrementDays : Int -> DateTime -> DateTime
+incrementDays days date =
+    if days > 0 then
+        incrementDays (days - 1) (DateTime.incrementDay date)
+
+    else
+        date
+
+
+decrementDays : Int -> DateTime -> DateTime
+decrementDays days date =
+    if days > 0 then
+        decrementDays (days - 1) (DateTime.decrementDay date)
+
+    else
+        date
