@@ -49,7 +49,7 @@ update msg model =
                                 DateLimit { minDate = d1, maxDate = d2 }
 
                             _ ->
-                                NoLimit { disablePastDates = False }
+                                NoLimit
                     }
 
                 timePickerConfig =
@@ -143,7 +143,6 @@ formatTime : Int -> String
 formatTime time =
     if time < 10 then
         "0" ++ String.fromInt time
-
     else
         String.fromInt time
 
@@ -152,10 +151,8 @@ formatMillis : Int -> String
 formatMillis millis =
     if millis < 10 then
         "00" ++ String.fromInt millis
-
     else if millis < 100 then
         "0" ++ String.fromInt millis
-
     else
         String.fromInt millis
 
