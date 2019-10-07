@@ -7,6 +7,7 @@ import Components.Double.DateTimePicker as DoubleDateTimePicker
 import Components.Single.DatePicker as SingleDatePicker
 import Components.Single.DateRangePicker as SingleDateRangePicker
 import Components.Single.DateTimePicker as SingleDateTimePicker
+import Components.Single.DateTimeRangePicker as SingleDateTimeRangePicker
 import Html exposing (Html, br, div, text)
 import Html.Attributes exposing (class)
 import Task
@@ -21,6 +22,7 @@ type alias Model =
     { singleDatePicker : Maybe SingleDatePicker.Model
     , singleDateTimePicker : Maybe SingleDateTimePicker.Model
     , singleDateRangePicker : Maybe SingleDateRangePicker.Model
+    , singleDateTimeRangePicker : Maybe SingleDateTimeRangePicker.Model
 
     --
     , doubleDatePicker : Maybe DoubleDatePicker.Model
@@ -34,6 +36,7 @@ type Msg
     | SingleDatePickerMsg SingleDatePicker.Msg
     | SingleDateTimePickerMsg SingleDateTimePicker.Msg
     | SingleDateRangePickerMsg SingleDateRangePicker.Msg
+    | SingleDateTimeRangePickerMsg SingleDateTimeRangePicker.Msg
       --
     | DoubleDatePickerMsg DoubleDatePicker.Msg
     | DoubleDateTimePickerMsg DoubleDateTimePicker.Msg
@@ -48,6 +51,7 @@ update msg model =
                 | singleDatePicker = Just (SingleDatePicker.init todayPosix)
                 , singleDateTimePicker = Just (SingleDateTimePicker.init todayPosix)
                 , singleDateRangePicker = Just (SingleDateRangePicker.init todayPosix)
+                , singleDateTimeRangePicker = Just (SingleDateTimeRangePicker.init todayPosix)
 
                 --
                 , doubleDatePicker = Just (DoubleDatePicker.init todayPosix)
@@ -104,6 +108,24 @@ update msg model =
                         | singleDateRangePicker = Just subModel
                       }
                     , Cmd.map SingleDateRangePickerMsg subCmd
+                    )
+
+                Nothing ->
+                    ( model
+                    , Cmd.none
+                    )
+
+        SingleDateTimeRangePickerMsg subMsg ->
+            case model.singleDateTimeRangePicker of
+                Just picker ->
+                    let
+                        ( subModel, subCmd ) =
+                            SingleDateTimeRangePicker.update subMsg picker
+                    in
+                    ( { model
+                        | singleDateTimeRangePicker = Just subModel
+                      }
+                    , Cmd.map SingleDateTimeRangePickerMsg subCmd
                     )
 
                 Nothing ->
@@ -189,6 +211,12 @@ view model =
 
                 Nothing ->
                     text "Single date range picker hasn't been initialised!"
+            , case model.singleDateTimeRangePicker of
+                Just picker ->
+                    Html.map SingleDateTimeRangePickerMsg (SingleDateTimeRangePicker.view picker)
+
+                Nothing ->
+                    text "Single date-time range picker hasn't been initialised!"
             , case model.doubleDatePicker of
                 Just picker ->
                     Html.map DoubleDatePickerMsg (DoubleDatePicker.view picker)
@@ -217,6 +245,7 @@ init flags =
     ( { singleDatePicker = Nothing
       , singleDateTimePicker = Nothing
       , singleDateRangePicker = Nothing
+      , singleDateTimeRangePicker = Nothing
 
       --
       , doubleDatePicker = Nothing
