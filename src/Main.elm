@@ -9,10 +9,18 @@ import Components.Single.DatePicker as SingleDatePicker
 import Components.Single.DateRangePicker as SingleDateRangePicker
 import Components.Single.DateTimePicker as SingleDateTimePicker
 import Components.Single.DateTimeRangePicker as SingleDateTimeRangePicker
+import Components.WithInput.Single.DatePicker as SingleDatePickerWithInput
 import Html exposing (Html, br, div, text)
 import Html.Attributes exposing (class)
 import Task
 import Time
+
+
+
+{- Note: The overall architecture here is only for the purposes
+   of the example. You'll usually not have such long names
+   for the components nor for the messages.
+-}
 
 
 type alias Flags =
@@ -30,6 +38,11 @@ type alias Model =
     , doubleDateTimePicker : Maybe DoubleDateTimePicker.Model
     , doubleDateRangePicker : Maybe DoubleDateRangePicker.Model
     , doubleDateTimeRangePicker : Maybe DoubleDateTimeRangePicker.Model
+
+    --
+    , withInput :
+        { singleDatePicker : Maybe SingleDatePickerWithInput.Model
+        }
     }
 
 
@@ -44,6 +57,8 @@ type Msg
     | DoubleDateTimePickerMsg DoubleDateTimePicker.Msg
     | DoubleDateRangePickerMsg DoubleDateRangePicker.Msg
     | DoubleDateTimeRangePickerMsg DoubleDateTimeRangePicker.Msg
+      --
+    | SingleDatePickerWithInputMsg SingleDatePickerWithInput.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -61,6 +76,9 @@ update msg model =
                 , doubleDateTimePicker = Just (DoubleDateTimePicker.init todayPosix)
                 , doubleDateRangePicker = Just (DoubleDateRangePicker.init todayPosix)
                 , doubleDateTimeRangePicker = Just (DoubleDateTimeRangePicker.init todayPosix)
+                , withInput =
+                    { singleDatePicker = Just (SingleDatePickerWithInput.init todayPosix)
+                    }
               }
             , Cmd.none
             )
@@ -209,6 +227,28 @@ update msg model =
                     , Cmd.none
                     )
 
+        SingleDatePickerWithInputMsg subMsg ->
+            case model.withInput.singleDatePicker of
+                Just picker ->
+                    let
+                        ( subModel, subCmd ) =
+                            SingleDatePickerWithInput.update subMsg picker
+
+                        { withInput } =
+                            model
+
+                        updatedWithInput =
+                            { withInput | singleDatePicker = Just subModel }
+                    in
+                    ( { model | withInput = updatedWithInput }
+                    , Cmd.map SingleDatePickerWithInputMsg subCmd
+                    )
+
+                Nothing ->
+                    ( model
+                    , Cmd.none
+                    )
+
 
 view : Model -> Document Msg
 view model =
@@ -239,6 +279,8 @@ view model =
 
                 Nothing ->
                     text "Single date-time range picker hasn't been initialised!"
+
+            --
             , case model.doubleDatePicker of
                 Just picker ->
                     Html.map DoubleDatePickerMsg (DoubleDatePicker.view picker)
@@ -263,6 +305,14 @@ view model =
 
                 Nothing ->
                     text "Double date-time range picker hasn't been initialised!"
+
+            --
+            , case model.withInput.singleDatePicker of
+                Just picker ->
+                    Html.map SingleDatePickerWithInputMsg (SingleDatePickerWithInput.view picker)
+
+                Nothing ->
+                    text "Single date picker with input hasn't been initialised!"
             ]
         ]
     }
@@ -280,6 +330,11 @@ init flags =
       , doubleDateTimePicker = Nothing
       , doubleDateRangePicker = Nothing
       , doubleDateTimeRangePicker = Nothing
+
+      --
+      , withInput =
+            { singleDatePicker = Nothing
+            }
       }
     , Task.perform Initialise Time.now
     )
@@ -291,5 +346,17 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = subscriptions
         }
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ case model.withInput.singleDatePicker of
+            Just picker ->
+                Sub.map SingleDatePickerWithInputMsg (SingleDatePickerWithInput.subscriptions picker)
+
+            Nothing ->
+                Sub.none
+        ]
