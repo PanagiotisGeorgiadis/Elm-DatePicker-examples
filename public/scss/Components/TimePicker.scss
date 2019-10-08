@@ -71,6 +71,11 @@
         color: var(--rich-grey);
     }
 
+    .placeholder,
+    .date {
+        height: 20px;
+    }
+
     .date {
         font-size: 14px;
         font-weight: var(--regular-weight);
