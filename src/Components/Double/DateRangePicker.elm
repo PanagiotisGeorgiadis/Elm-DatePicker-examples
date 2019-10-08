@@ -1,4 +1,10 @@
-module Components.Double.DateRangePicker exposing (..)
+module Components.Double.DateRangePicker exposing
+    ( Model
+    , Msg
+    , init
+    , update
+    , view
+    )
 
 import DateRangePicker exposing (SelectedDateRange)
 import DateRangePicker.Types exposing (DateLimit(..), ViewType(..))
