@@ -13,7 +13,7 @@ import DatePicker.Types exposing (DateLimit(..), ViewType(..))
 import DateTime exposing (DateTime)
 import Extra.Date as DateExtra
 import Extra.DateTime as DateTimeExtra
-import Html exposing (Html, div, h3, input, text)
+import Html exposing (Html, br, div, h3, input, span, text)
 import Html.Attributes exposing (class, readonly, value)
 import Html.Events exposing (onFocus, stopPropagationOn)
 import Json.Decode as Decode
