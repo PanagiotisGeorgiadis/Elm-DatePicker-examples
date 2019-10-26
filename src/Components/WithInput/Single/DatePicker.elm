@@ -126,12 +126,24 @@ view { picker, selectedDateTime, isFocused } =
               else
                 text ""
             ]
+        , br [] []
+        , case selectedDateTime of
+            Just sdt ->
+                div [ class "footer" ]
+                    [ span [ class "text" ] [ text "Selected DateTime: " ]
+                    , span [ class "date" ] [ text (DateTimeExtra.toString sdt) ]
+                    ]
+
+            Nothing ->
+                div [ class "footer" ]
+                    [ text "No \"selected date\" yet"
+                    ]
         ]
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
-    if model.isFocused then
+subscriptions { isFocused } =
+    if isFocused then
         Browser.onClick (Decode.succeed GlobalClickHandler)
 
     else

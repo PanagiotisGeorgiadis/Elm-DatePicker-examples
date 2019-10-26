@@ -28,5 +28,6 @@ body {
 }
 
 .page > .section > .input-group {
+    min-height: 350px;
     display: inline-block;
 }
