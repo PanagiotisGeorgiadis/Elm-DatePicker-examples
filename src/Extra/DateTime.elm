@@ -1,6 +1,8 @@
 module Extra.DateTime exposing
     ( decrementDays
+    , decrementMonths
     , incrementDays
+    , incrementMonths
     , toString
     )
 
@@ -49,18 +51,36 @@ formatMillis millis =
 
 
 incrementDays : Int -> DateTime -> DateTime
-incrementDays days date =
+incrementDays days dateTime =
     if days > 0 then
-        incrementDays (days - 1) (DateTime.incrementDay date)
+        incrementDays (days - 1) (DateTime.incrementDay dateTime)
 
     else
-        date
+        dateTime
 
 
 decrementDays : Int -> DateTime -> DateTime
-decrementDays days date =
+decrementDays days dateTime =
     if days > 0 then
-        decrementDays (days - 1) (DateTime.decrementDay date)
+        decrementDays (days - 1) (DateTime.decrementDay dateTime)
 
     else
-        date
+        dateTime
+
+
+incrementMonths : Int -> DateTime -> DateTime
+incrementMonths count dateTime =
+    if count > 0 then
+        incrementMonths (count - 1) (DateTime.incrementMonth dateTime)
+
+    else
+        dateTime
+
+
+decrementMonths : Int -> DateTime -> DateTime
+decrementMonths count dateTime =
+    if count > 0 then
+        decrementMonths (count - 1) (DateTime.decrementMonth dateTime)
+
+    else
+        dateTime

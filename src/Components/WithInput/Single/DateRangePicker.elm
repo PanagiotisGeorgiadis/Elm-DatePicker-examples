@@ -36,11 +36,13 @@ init todayPosix =
         -- Allow 6 months in advance and in the past selection.
         ( minDate, maxDate ) =
             let
-                sixMonthDays =
-                    186
+                ( past, future ) =
+                    ( DateTimeExtra.decrementMonths 6 today
+                    , DateTimeExtra.incrementMonths 6 today
+                    )
             in
-            ( DateTimeExtra.decrementDays sixMonthDays today
-            , DateTimeExtra.incrementDays sixMonthDays today
+            ( Maybe.withDefault past <| DateTime.setDay 1 past
+            , Maybe.withDefault future <| DateTime.setDay (DateTime.lastDayOf future) future
             )
 
         calendarConfig =
