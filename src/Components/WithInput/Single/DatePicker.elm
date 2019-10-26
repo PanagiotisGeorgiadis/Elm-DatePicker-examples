@@ -14,7 +14,7 @@ import DateTime exposing (DateTime)
 import Extra.Date as DateExtra
 import Extra.DateTime as DateTimeExtra
 import Html exposing (Html, div, h3, input, text)
-import Html.Attributes exposing (class, value)
+import Html.Attributes exposing (class, readonly, value)
 import Html.Events exposing (onFocus, stopPropagationOn)
 import Json.Decode as Decode
 import Time exposing (Posix)
@@ -119,7 +119,7 @@ view { picker, selectedDateTime, isFocused } =
     div [ class "section" ]
         [ h3 [] [ text "Single Date Picker With Input" ]
         , div [ class "input-group", stopPropagationOn "click" (Decode.succeed ( NoOp, True )) ]
-            [ input [ onFocus FocusHandler, value dateValue ] []
+            [ input [ onFocus FocusHandler, value dateValue, readonly True ] []
             , if isFocused then
                 Html.map PickerMsg (DatePicker.view picker)
 
