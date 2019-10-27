@@ -2,23 +2,17 @@
   "name": "datepicker",
   "version": "1.0.0",
   "description": "Date Picker module written in Elm.",
-  "main": "index.js",
+  "main": "index.html",
   "scripts": {
-    "start": "node app.js",
-    "elm-make": "elm make ./src/Main.elm --output=./public/scripts/elm.bundle.js",
-    "compile-sass": "node ./private/nodeSass.js",
-    "test-init": "elm-test init",
-    "test-watch": "node app.test.js",
-    "test": "elm-test"
+    "start": "parcel serve index.html --port 7000 --no-cache --no-source-maps",
+    "build": "parcel build index.html --out-dir build --no-cache --no-source-maps"
   },
   "author": "Panagiotis Georgiadis",
   "license": "ISC",
-  "dependencies": {
-    "elm": "^0.19.0-no-deps"
-  },
   "devDependencies": {
-    "express": "^4.16.4",
-    "node-sass": "^4.10.0",
-    "socket.io": "^2.1.1"
+    "elm-hot": "^1.1.2",
+    "node-elm-compiler": "^5.0.4",
+    "parcel-bundler": "^1.12.4",
+    "sass": "^1.23.1"
   }
 }
