@@ -1,5 +1,8 @@
-node_modules/
-package-lock.json
+.cache/
+build/
 elm-stuff/
+dist/
+node_modules/
+
 public/scripts/elm.bundle.js
 public/styles/styles.css
