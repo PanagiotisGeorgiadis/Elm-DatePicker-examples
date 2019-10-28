@@ -29,6 +29,7 @@ It seems that these errors can be fixed *( at least at the moment of writing )* 
  2) Run `npm run build`.
 
 <br/>
+<strike>
 #### Elm related issues:
 The only Elm related issue I've encountered was the ***well known*** `elm: Map.!: given key is not an element in the map`.
 This issue is known to be an issue in the `0.19.0` version of the compiler and it seems to be triggered by the `--debug` flag passed onto the cli. It seems like the `node-elm-compiler` module used by `parceljs` is using the `--debug` flag when using `serve` or `watch`.<br/>
@@ -38,3 +39,6 @@ In order to mitigate for that while on the `dev` environment I suggest to do the
 2) Search for `return ["--debug"]` and replace it with `return []`
 
 **Note:** This will unfortunately disable the elm live debugger but it ***should*** fix the error mentioned above.
+</strike>
+
+The issue mentioned above seems to be fixed by bumping the Elm version to **0.19.1**. I've also added the Elm dependency as an npm dependency for ease of use.
