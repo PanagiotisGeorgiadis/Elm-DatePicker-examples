@@ -1,4 +1,4 @@
-module Components.WithInput.Single.DateTimeRangePicker exposing
+module Components.WithInput.Double.DateTimeRangePicker exposing
     ( Model
     , Msg
     , init
@@ -63,7 +63,7 @@ init todayPosix =
                 , mirrorTimes = True
                 }
     in
-    { picker = DateRangePicker.initialise Single calendarConfig timePickerConfig
+    { picker = DateRangePicker.initialise Double calendarConfig timePickerConfig
     , selectedRange = Nothing
     , isFocused = False
     }
@@ -130,7 +130,7 @@ view { picker, selectedRange, isFocused } =
                     ""
     in
     div [ class "section" ]
-        [ h3 [] [ text "Single Date-Time Range Picker With Input" ]
+        [ h3 [] [ text "Double Date-Time Range Picker With Input" ]
         , div [ class "input-group", stopPropagationOn "click" (Decode.succeed ( NoOp, True )) ]
             [ input [ onFocus FocusHandler, value dateValue, readonly True ] []
             , if isFocused then
