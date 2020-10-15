@@ -12,6 +12,7 @@ import Components.Single.DateTimeRangePicker as SingleDateTimeRangePicker
 import Components.WithInput.Double.DatePicker as DoubleDatePickerWithInput
 import Components.WithInput.Double.DateRangePicker as DoubleDateRangePickerWithInput
 import Components.WithInput.Double.DateTimePicker as DoubleDateTimePickerWithInput
+import Components.WithInput.Double.DateTimeRangePicker as DoubleDateTimeRangePickerWithInput
 import Components.WithInput.Single.DatePicker as SingleDatePickerWithInput
 import Components.WithInput.Single.DateRangePicker as SingleDateRangePickerWithInput
 import Components.WithInput.Single.DateTimePicker as SingleDateTimePickerWithInput
@@ -56,6 +57,7 @@ type alias Model =
         , doubleDatePicker : Maybe DoubleDatePickerWithInput.Model
         , doubleDateTimePicker : Maybe DoubleDateTimePickerWithInput.Model
         , doubleDateRangePicker : Maybe DoubleDateRangePickerWithInput.Model
+        , doubleDateTimeRangePicker : Maybe DoubleDateTimeRangePickerWithInput.Model
         }
     }
 
@@ -80,6 +82,7 @@ type Msg
     | DoubleDatePickerWithInputMsg DoubleDatePickerWithInput.Msg
     | DoubleDateTimePickerWithInputMsg DoubleDateTimePickerWithInput.Msg
     | DoubleDateRangePickerWithInputMsg DoubleDateRangePickerWithInput.Msg
+    | DoubleDateTimeRangePickerWithInputMsg DoubleDateTimeRangePickerWithInput.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -109,6 +112,7 @@ update msg model =
                     , doubleDatePicker = Just (DoubleDatePickerWithInput.init todayPosix)
                     , doubleDateTimePicker = Just (DoubleDateTimePickerWithInput.init todayPosix)
                     , doubleDateRangePicker = Just (DoubleDateRangePickerWithInput.init todayPosix)
+                    , doubleDateTimeRangePicker = Just (DoubleDateTimeRangePickerWithInput.init todayPosix)
                     }
               }
             , Cmd.none
@@ -412,6 +416,28 @@ update msg model =
                     , Cmd.none
                     )
 
+        DoubleDateTimeRangePickerWithInputMsg subMsg ->
+            case model.withInput.doubleDateTimeRangePicker of
+                Just picker ->
+                    let
+                        ( subModel, subCmd ) =
+                            DoubleDateTimeRangePickerWithInput.update subMsg picker
+
+                        { withInput } =
+                            model
+
+                        updatedWithInput =
+                            { withInput | doubleDateTimeRangePicker = Just subModel }
+                    in
+                    ( { model | withInput = updatedWithInput }
+                    , Cmd.none
+                    )
+
+                Nothing ->
+                    ( model
+                    , Cmd.none
+                    )
+
 
 view : Model -> Document Msg
 view model =
@@ -514,6 +540,12 @@ view model =
 
                 Nothing ->
                     text "Double date range picker with input hasn't been initialised!"
+            , case model.withInput.doubleDateTimeRangePicker of
+                Just picker ->
+                    Html.map DoubleDateTimeRangePickerWithInputMsg (DoubleDateTimeRangePickerWithInput.view picker)
+
+                Nothing ->
+                    text "Double date-time range picker with input hasn't been initialised!"
             ]
         ]
     }
@@ -543,6 +575,7 @@ init flags =
             , doubleDatePicker = Nothing
             , doubleDateTimePicker = Nothing
             , doubleDateRangePicker = Nothing
+            , doubleDateTimeRangePicker = Nothing
             }
       }
     , Task.perform Initialise Time.now
@@ -603,6 +636,12 @@ subscriptions model =
         , case model.withInput.doubleDateRangePicker of
             Just picker ->
                 Sub.map DoubleDateRangePickerWithInputMsg (DoubleDateRangePickerWithInput.subscriptions picker)
+
+            Nothing ->
+                Sub.none
+        , case model.withInput.doubleDateTimeRangePicker of
+            Just picker ->
+                Sub.map DoubleDateTimeRangePickerWithInputMsg (DoubleDateTimeRangePickerWithInput.subscriptions picker)
 
             Nothing ->
                 Sub.none
