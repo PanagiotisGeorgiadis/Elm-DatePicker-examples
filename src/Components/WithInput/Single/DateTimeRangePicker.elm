@@ -130,7 +130,7 @@ view { picker, selectedRange, isFocused } =
                     ""
     in
     div [ class "section" ]
-        [ h3 [] [ text "Single Date Range Picker With Input" ]
+        [ h3 [] [ text "Single Date-Time Range Picker With Input" ]
         , div [ class "input-group", stopPropagationOn "click" (Decode.succeed ( NoOp, True )) ]
             [ input [ onFocus FocusHandler, value dateValue, readonly True ] []
             , if isFocused then
