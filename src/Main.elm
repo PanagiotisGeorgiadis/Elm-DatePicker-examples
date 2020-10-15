@@ -11,6 +11,7 @@ import Components.Single.DateTimePicker as SingleDateTimePicker
 import Components.Single.DateTimeRangePicker as SingleDateTimeRangePicker
 import Components.WithInput.Double.DatePicker as DoubleDatePickerWithInput
 import Components.WithInput.Double.DateRangePicker as DoubleDateRangePickerWithInput
+import Components.WithInput.Double.DateTimePicker as DoubleDateTimePickerWithInput
 import Components.WithInput.Single.DatePicker as SingleDatePickerWithInput
 import Components.WithInput.Single.DateRangePicker as SingleDateRangePickerWithInput
 import Components.WithInput.Single.DateTimePicker as SingleDateTimePickerWithInput
@@ -53,6 +54,7 @@ type alias Model =
 
         --
         , doubleDatePicker : Maybe DoubleDatePickerWithInput.Model
+        , doubleDateTimePicker : Maybe DoubleDateTimePickerWithInput.Model
         , doubleDateRangePicker : Maybe DoubleDateRangePickerWithInput.Model
         }
     }
@@ -76,6 +78,7 @@ type Msg
     | SingleDateTimeRangePickerWithInputMsg SingleDateTimeRangePickerWithInput.Msg
       --
     | DoubleDatePickerWithInputMsg DoubleDatePickerWithInput.Msg
+    | DoubleDateTimePickerWithInputMsg DoubleDateTimePickerWithInput.Msg
     | DoubleDateRangePickerWithInputMsg DoubleDateRangePickerWithInput.Msg
 
 
@@ -104,6 +107,7 @@ update msg model =
 
                     --
                     , doubleDatePicker = Just (DoubleDatePickerWithInput.init todayPosix)
+                    , doubleDateTimePicker = Just (DoubleDateTimePickerWithInput.init todayPosix)
                     , doubleDateRangePicker = Just (DoubleDateRangePickerWithInput.init todayPosix)
                     }
               }
@@ -364,6 +368,28 @@ update msg model =
                     , Cmd.none
                     )
 
+        DoubleDateTimePickerWithInputMsg subMsg ->
+            case model.withInput.doubleDateTimePicker of
+                Just picker ->
+                    let
+                        ( subModel, subCmd ) =
+                            DoubleDateTimePickerWithInput.update subMsg picker
+
+                        { withInput } =
+                            model
+
+                        updatedWithInput =
+                            { withInput | doubleDateTimePicker = Just subModel }
+                    in
+                    ( { model | withInput = updatedWithInput }
+                    , Cmd.map DoubleDateTimePickerWithInputMsg subCmd
+                    )
+
+                Nothing ->
+                    ( model
+                    , Cmd.none
+                    )
+
         DoubleDateRangePickerWithInputMsg subMsg ->
             case model.withInput.doubleDateRangePicker of
                 Just picker ->
@@ -476,6 +502,12 @@ view model =
 
                 Nothing ->
                     text "Double date picker with input hasn't been initialised!"
+            , case model.withInput.doubleDateTimePicker of
+                Just picker ->
+                    Html.map DoubleDateTimePickerWithInputMsg (DoubleDateTimePickerWithInput.view picker)
+
+                Nothing ->
+                    text "Single date-time picker with input hasn't been initialised!"
             , case model.withInput.doubleDateRangePicker of
                 Just picker ->
                     Html.map DoubleDateRangePickerWithInputMsg (DoubleDateRangePickerWithInput.view picker)
@@ -509,6 +541,7 @@ init flags =
 
             --
             , doubleDatePicker = Nothing
+            , doubleDateTimePicker = Nothing
             , doubleDateRangePicker = Nothing
             }
       }
@@ -558,6 +591,12 @@ subscriptions model =
         , case model.withInput.doubleDatePicker of
             Just picker ->
                 Sub.map DoubleDatePickerWithInputMsg (DoubleDatePickerWithInput.subscriptions picker)
+
+            Nothing ->
+                Sub.none
+        , case model.withInput.doubleDateTimePicker of
+            Just picker ->
+                Sub.map DoubleDateTimePickerWithInputMsg (DoubleDateTimePickerWithInput.subscriptions picker)
 
             Nothing ->
                 Sub.none
