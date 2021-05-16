@@ -1,4 +1,5 @@
 .cache/
+.parcel-cache/
 build/
 elm-stuff/
 dist/
