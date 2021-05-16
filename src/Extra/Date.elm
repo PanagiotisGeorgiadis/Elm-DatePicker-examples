@@ -1,8 +1,6 @@
 module Extra.Date exposing (toString)
 
 import Calendar
-import Extra.Time.Month as MonthExtra
-import Extra.Time.Weekday as WeekdayExtra
 
 
 toString : Calendar.Date -> String

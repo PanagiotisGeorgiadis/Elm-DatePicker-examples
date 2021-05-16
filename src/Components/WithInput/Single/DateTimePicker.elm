@@ -14,6 +14,7 @@ import DatePicker.Types exposing (DateLimit(..), ViewType(..))
 import DateTime exposing (DateTime)
 import Extra.Date as DateExtra
 import Extra.DateTime as DateTimeExtra
+import Extra.I18n exposing (Language, getI18n, timePickerI18n)
 import Html exposing (Html, br, div, h3, input, span, text)
 import Html.Attributes exposing (class, readonly, value)
 import Html.Events exposing (onFocus, stopPropagationOn)
@@ -29,8 +30,8 @@ type alias Model =
     }
 
 
-init : Time.Posix -> Model
-init todayPosix =
+init : Language -> Posix -> Model
+init language todayPosix =
     let
         today =
             DateTime.fromPosix todayPosix
@@ -58,10 +59,14 @@ init todayPosix =
             Just
                 { pickerType = TimePicker.HH_MM { hoursStep = 1, minutesStep = 5 }
                 , defaultTime = Clock.midnight
-                , pickerTitle = "Select Time"
+                , pickerTitle = timePickerI18n language
                 }
+
+        i18n =
+            Just (getI18n language)
     in
-    { picker = DatePicker.initialise Single calendarConfig timePickerConfig
+    { picker =
+        DatePicker.initialise Single calendarConfig timePickerConfig i18n
     , selectedDateTime = Nothing
     , isFocused = False
     }

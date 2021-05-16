@@ -13,6 +13,7 @@ import DateRangePicker.Types exposing (DateLimit(..), ViewType(..))
 import DateTime
 import Extra.Date as DateExtra
 import Extra.DateTime as DateTimeExtra
+import Extra.I18n exposing (Language, getI18n)
 import Html exposing (Html, br, div, h3, input, span, text)
 import Html.Attributes exposing (class, readonly, value)
 import Html.Events exposing (onFocus, stopPropagationOn)
@@ -27,8 +28,8 @@ type alias Model =
     }
 
 
-init : Posix -> Model
-init todayPosix =
+init : Language -> Posix -> Model
+init language todayPosix =
     let
         today =
             DateTime.fromPosix todayPosix
@@ -55,8 +56,12 @@ init todayPosix =
         -- The `timePickerConfig` is set to `Nothing` cause we don't want one.
         timePickerConfig =
             Nothing
+
+        i18n =
+            Just (getI18n language)
     in
-    { picker = DateRangePicker.initialise Double calendarConfig timePickerConfig
+    { picker =
+        DateRangePicker.initialise Double calendarConfig timePickerConfig i18n
     , selectedRange = Nothing
     , isFocused = False
     }

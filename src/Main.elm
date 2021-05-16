@@ -17,8 +17,11 @@ import Components.WithInput.Single.DatePicker as SingleDatePickerWithInput
 import Components.WithInput.Single.DateRangePicker as SingleDateRangePickerWithInput
 import Components.WithInput.Single.DateTimePicker as SingleDateTimePickerWithInput
 import Components.WithInput.Single.DateTimeRangePicker as SingleDateTimeRangePickerWithInput
-import Html exposing (Html, br, div, text)
-import Html.Attributes exposing (class)
+import Extra.I18n exposing (Language(..))
+import Html exposing (div, h4, input, label, text)
+import Html.Attributes exposing (checked, class, name, type_, value)
+import Html.Events exposing (on)
+import Json.Decode as Decode
 import Task
 import Time
 
@@ -59,6 +62,7 @@ type alias Model =
         , doubleDateRangePicker : Maybe DoubleDateRangePickerWithInput.Model
         , doubleDateTimeRangePicker : Maybe DoubleDateTimeRangePickerWithInput.Model
         }
+    , language : Language
     }
 
 
@@ -83,6 +87,8 @@ type Msg
     | DoubleDateTimePickerWithInputMsg DoubleDateTimePickerWithInput.Msg
     | DoubleDateRangePickerWithInputMsg DoubleDateRangePickerWithInput.Msg
     | DoubleDateTimeRangePickerWithInputMsg DoubleDateTimeRangePickerWithInput.Msg
+      --
+    | HandleLanguageChangeMsg Language
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -90,29 +96,29 @@ update msg model =
     case msg of
         Initialise todayPosix ->
             ( { model
-                | singleDatePicker = Just (SingleDatePicker.init todayPosix)
-                , singleDateTimePicker = Just (SingleDateTimePicker.init todayPosix)
-                , singleDateRangePicker = Just (SingleDateRangePicker.init todayPosix)
-                , singleDateTimeRangePicker = Just (SingleDateTimeRangePicker.init todayPosix)
+                | singleDatePicker = Just (SingleDatePicker.init model.language todayPosix)
+                , singleDateTimePicker = Just (SingleDateTimePicker.init model.language todayPosix)
+                , singleDateRangePicker = Just (SingleDateRangePicker.init model.language todayPosix)
+                , singleDateTimeRangePicker = Just (SingleDateTimeRangePicker.init model.language todayPosix)
 
                 --
-                , doubleDatePicker = Just (DoubleDatePicker.init todayPosix)
-                , doubleDateTimePicker = Just (DoubleDateTimePicker.init todayPosix)
-                , doubleDateRangePicker = Just (DoubleDateRangePicker.init todayPosix)
-                , doubleDateTimeRangePicker = Just (DoubleDateTimeRangePicker.init todayPosix)
+                , doubleDatePicker = Just (DoubleDatePicker.init model.language todayPosix)
+                , doubleDateTimePicker = Just (DoubleDateTimePicker.init model.language todayPosix)
+                , doubleDateRangePicker = Just (DoubleDateRangePicker.init model.language todayPosix)
+                , doubleDateTimeRangePicker = Just (DoubleDateTimeRangePicker.init model.language todayPosix)
 
                 --
                 , withInput =
-                    { singleDatePicker = Just (SingleDatePickerWithInput.init todayPosix)
-                    , singleDateTimePicker = Just (SingleDateTimePickerWithInput.init todayPosix)
-                    , singleDateRangePicker = Just (SingleDateRangePickerWithInput.init todayPosix)
-                    , singleDateTimeRangePicker = Just (SingleDateTimeRangePickerWithInput.init todayPosix)
+                    { singleDatePicker = Just (SingleDatePickerWithInput.init model.language todayPosix)
+                    , singleDateTimePicker = Just (SingleDateTimePickerWithInput.init model.language todayPosix)
+                    , singleDateRangePicker = Just (SingleDateRangePickerWithInput.init model.language todayPosix)
+                    , singleDateTimeRangePicker = Just (SingleDateTimeRangePickerWithInput.init model.language todayPosix)
 
                     --
-                    , doubleDatePicker = Just (DoubleDatePickerWithInput.init todayPosix)
-                    , doubleDateTimePicker = Just (DoubleDateTimePickerWithInput.init todayPosix)
-                    , doubleDateRangePicker = Just (DoubleDateRangePickerWithInput.init todayPosix)
-                    , doubleDateTimeRangePicker = Just (DoubleDateTimeRangePickerWithInput.init todayPosix)
+                    , doubleDatePicker = Just (DoubleDatePickerWithInput.init model.language todayPosix)
+                    , doubleDateTimePicker = Just (DoubleDateTimePickerWithInput.init model.language todayPosix)
+                    , doubleDateRangePicker = Just (DoubleDateRangePickerWithInput.init model.language todayPosix)
+                    , doubleDateTimeRangePicker = Just (DoubleDateTimeRangePickerWithInput.init model.language todayPosix)
                     }
               }
             , Cmd.none
@@ -438,13 +444,45 @@ update msg model =
                     , Cmd.none
                     )
 
+        HandleLanguageChangeMsg language ->
+            ( { model | language = language }
+            , Task.perform Initialise Time.now
+            )
+
 
 view : Model -> Document Msg
 view model =
     { title = "DatePickers example"
     , body =
         [ div [ class "page" ]
-            [ case model.singleDatePicker of
+            [ div [ class "language-picker" ]
+                [ h4 [] [ text "Select Language" ]
+                , div [ class "input-row" ]
+                    [ label []
+                        [ input
+                            [ type_ "radio"
+                            , name "language"
+                            , value "English"
+                            , checked (model.language == English)
+                            , on "change" (Decode.succeed (HandleLanguageChangeMsg English))
+                            ]
+                            []
+                        , text "English"
+                        ]
+                    , label []
+                        [ input
+                            [ type_ "radio"
+                            , name "language"
+                            , value "Greek"
+                            , checked (model.language == Greek)
+                            , on "change" (Decode.succeed (HandleLanguageChangeMsg Greek))
+                            ]
+                            []
+                        , text "Greek"
+                        ]
+                    ]
+                ]
+            , case model.singleDatePicker of
                 Just picker ->
                     Html.map SingleDatePickerMsg (SingleDatePicker.view picker)
 
@@ -577,6 +615,7 @@ init flags =
             , doubleDateRangePicker = Nothing
             , doubleDateTimeRangePicker = Nothing
             }
+      , language = English
       }
     , Task.perform Initialise Time.now
     )

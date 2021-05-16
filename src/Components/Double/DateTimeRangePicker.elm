@@ -11,6 +11,7 @@ import DateRangePicker exposing (SelectedDateRange)
 import DateRangePicker.Types exposing (DateLimit(..), ViewType(..))
 import DateTime
 import Extra.DateTime as DateTimeExtra
+import Extra.I18n exposing (Language, getI18n, rangeTimePickerI18n)
 import Html exposing (Html, br, div, h3, span, text)
 import Html.Attributes exposing (class)
 import Time exposing (Posix)
@@ -23,8 +24,8 @@ type alias Model =
     }
 
 
-init : Posix -> Model
-init todayPosix =
+init : Language -> Posix -> Model
+init language todayPosix =
     let
         today =
             DateTime.fromPosix todayPosix
@@ -53,11 +54,15 @@ init todayPosix =
             Just
                 { pickerType = TimePicker.HH_MM { hoursStep = 1, minutesStep = 5 }
                 , defaultTime = Clock.midnight
-                , pickerTitles = { start = "Start Date Time", end = "End Date Time" }
                 , mirrorTimes = True
+                , i18n = rangeTimePickerI18n language
                 }
+
+        i18n =
+            Just (getI18n language)
     in
-    { picker = DateRangePicker.initialise Double calendarConfig timePickerConfig
+    { picker =
+        DateRangePicker.initialise Double calendarConfig timePickerConfig i18n
     , selectedRange = Nothing
     }
 
