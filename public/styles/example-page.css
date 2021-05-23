@@ -1,46 +1,50 @@
 body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+  font-family: "Roboto", sans-serif;
 }
 
 .page > .section {
-    min-height: 375px;
-    padding: 24px;
-    border-bottom: 2px solid lightgray;
+  min-height: 375px;
+  padding: 24px;
+  border-bottom: 2px solid lightgray;
 }
 
 .page > .section > h3 {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 .page > .section > .footer > .text {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .page > .section > .footer > .date {
-    margin-left: 8px;
+  margin-left: 8px;
 }
 
 .page > .section > .footer > .separator {
-    margin-left: 8px;
-    font-weight: bold;
+  margin-left: 8px;
+  font-weight: bold;
 }
 
 .page > .section > .input-group {
-    min-height: 350px;
-    display: inline-block;
+  min-height: 350px;
+  display: inline-block;
 }
 
-.page > .language-picker {
-    padding: 24px;
-    border-bottom: 2px solid lightgray;
+.page > .picker-row {
+  padding: 24px;
+  border-bottom: 2px solid lightgray;
 }
 
-.page > .language-picker > h4 {
-    margin-top: 0;
+.page > .picker-row > h4 {
+  margin-top: 0;
 }
 
-.page > .language-picker > .input-row > label:first-child {
-    margin-right: 16px;
+.page > .picker-row > .input-row > label {
+  margin-right: 16px;
+}
+
+.page > .picker-row > .input-row > label:last-of-type {
+  margin-right: 0;
 }

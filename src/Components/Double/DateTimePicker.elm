@@ -14,7 +14,7 @@ import Extra.DateTime as DateTimeExtra
 import Extra.I18n exposing (Language, getI18n, timePickerI18n)
 import Html exposing (Html, br, div, h3, span, text)
 import Html.Attributes exposing (class)
-import Time exposing (Posix)
+import Time exposing (Posix, Weekday)
 import TimePicker.Types as TimePicker
 
 
@@ -24,8 +24,8 @@ type alias Model =
     }
 
 
-init : Language -> Posix -> Model
-init language todayPosix =
+init : Language -> Weekday -> Posix -> Model
+init language startingWeekday todayPosix =
     let
         today =
             DateTime.fromPosix todayPosix
@@ -44,6 +44,7 @@ init language todayPosix =
 
         calendarConfig =
             { today = today
+            , startingWeekday = startingWeekday
             , primaryDate = Nothing
             , dateLimit = DateLimit { minDate = minDate, maxDate = maxDate }
             }

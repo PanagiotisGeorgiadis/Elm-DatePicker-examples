@@ -19,7 +19,7 @@ import Html exposing (Html, br, div, h3, input, span, text)
 import Html.Attributes exposing (class, readonly, value)
 import Html.Events exposing (onFocus, stopPropagationOn)
 import Json.Decode as Decode
-import Time exposing (Posix)
+import Time exposing (Posix, Weekday)
 import TimePicker.Types as TimePicker
 
 
@@ -30,8 +30,8 @@ type alias Model =
     }
 
 
-init : Language -> Posix -> Model
-init language todayPosix =
+init : Language -> Weekday -> Posix -> Model
+init language startingWeekday todayPosix =
     let
         today =
             DateTime.fromPosix todayPosix
@@ -50,6 +50,7 @@ init language todayPosix =
 
         calendarConfig =
             { today = today
+            , startingWeekday = startingWeekday
             , primaryDate = Nothing
             , dateLimit = DateLimit { minDate = minDate, maxDate = maxDate }
             }

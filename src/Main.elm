@@ -18,6 +18,7 @@ import Components.WithInput.Single.DateRangePicker as SingleDateRangePickerWithI
 import Components.WithInput.Single.DateTimePicker as SingleDateTimePickerWithInput
 import Components.WithInput.Single.DateTimeRangePicker as SingleDateTimeRangePickerWithInput
 import Extra.I18n exposing (Language(..))
+import Extra.Time.Weekday
 import Html exposing (div, h4, input, label, text)
 import Html.Attributes exposing (checked, class, name, type_, value)
 import Html.Events exposing (on)
@@ -63,6 +64,7 @@ type alias Model =
         , doubleDateTimeRangePicker : Maybe DoubleDateTimeRangePickerWithInput.Model
         }
     , language : Language
+    , startingWeekday : Time.Weekday
     }
 
 
@@ -89,6 +91,7 @@ type Msg
     | DoubleDateTimeRangePickerWithInputMsg DoubleDateTimeRangePickerWithInput.Msg
       --
     | HandleLanguageChangeMsg Language
+    | HandleStartingWeekdayChange Time.Weekday
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -96,29 +99,29 @@ update msg model =
     case msg of
         Initialise todayPosix ->
             ( { model
-                | singleDatePicker = Just (SingleDatePicker.init model.language todayPosix)
-                , singleDateTimePicker = Just (SingleDateTimePicker.init model.language todayPosix)
-                , singleDateRangePicker = Just (SingleDateRangePicker.init model.language todayPosix)
-                , singleDateTimeRangePicker = Just (SingleDateTimeRangePicker.init model.language todayPosix)
+                | singleDatePicker = Just (SingleDatePicker.init model.language model.startingWeekday todayPosix)
+                , singleDateTimePicker = Just (SingleDateTimePicker.init model.language model.startingWeekday todayPosix)
+                , singleDateRangePicker = Just (SingleDateRangePicker.init model.language model.startingWeekday todayPosix)
+                , singleDateTimeRangePicker = Just (SingleDateTimeRangePicker.init model.language model.startingWeekday todayPosix)
 
                 --
-                , doubleDatePicker = Just (DoubleDatePicker.init model.language todayPosix)
-                , doubleDateTimePicker = Just (DoubleDateTimePicker.init model.language todayPosix)
-                , doubleDateRangePicker = Just (DoubleDateRangePicker.init model.language todayPosix)
-                , doubleDateTimeRangePicker = Just (DoubleDateTimeRangePicker.init model.language todayPosix)
+                , doubleDatePicker = Just (DoubleDatePicker.init model.language model.startingWeekday todayPosix)
+                , doubleDateTimePicker = Just (DoubleDateTimePicker.init model.language model.startingWeekday todayPosix)
+                , doubleDateRangePicker = Just (DoubleDateRangePicker.init model.language model.startingWeekday todayPosix)
+                , doubleDateTimeRangePicker = Just (DoubleDateTimeRangePicker.init model.language model.startingWeekday todayPosix)
 
                 --
                 , withInput =
-                    { singleDatePicker = Just (SingleDatePickerWithInput.init model.language todayPosix)
-                    , singleDateTimePicker = Just (SingleDateTimePickerWithInput.init model.language todayPosix)
-                    , singleDateRangePicker = Just (SingleDateRangePickerWithInput.init model.language todayPosix)
-                    , singleDateTimeRangePicker = Just (SingleDateTimeRangePickerWithInput.init model.language todayPosix)
+                    { singleDatePicker = Just (SingleDatePickerWithInput.init model.language model.startingWeekday todayPosix)
+                    , singleDateTimePicker = Just (SingleDateTimePickerWithInput.init model.language model.startingWeekday todayPosix)
+                    , singleDateRangePicker = Just (SingleDateRangePickerWithInput.init model.language model.startingWeekday todayPosix)
+                    , singleDateTimeRangePicker = Just (SingleDateTimeRangePickerWithInput.init model.language model.startingWeekday todayPosix)
 
                     --
-                    , doubleDatePicker = Just (DoubleDatePickerWithInput.init model.language todayPosix)
-                    , doubleDateTimePicker = Just (DoubleDateTimePickerWithInput.init model.language todayPosix)
-                    , doubleDateRangePicker = Just (DoubleDateRangePickerWithInput.init model.language todayPosix)
-                    , doubleDateTimeRangePicker = Just (DoubleDateTimeRangePickerWithInput.init model.language todayPosix)
+                    , doubleDatePicker = Just (DoubleDatePickerWithInput.init model.language model.startingWeekday todayPosix)
+                    , doubleDateTimePicker = Just (DoubleDateTimePickerWithInput.init model.language model.startingWeekday todayPosix)
+                    , doubleDateRangePicker = Just (DoubleDateRangePickerWithInput.init model.language model.startingWeekday todayPosix)
+                    , doubleDateTimeRangePicker = Just (DoubleDateTimeRangePickerWithInput.init model.language model.startingWeekday todayPosix)
                     }
               }
             , Cmd.none
@@ -449,13 +452,18 @@ update msg model =
             , Task.perform Initialise Time.now
             )
 
+        HandleStartingWeekdayChange weekday ->
+            ( { model | startingWeekday = weekday }
+            , Task.perform Initialise Time.now
+            )
+
 
 view : Model -> Document Msg
 view model =
     { title = "DatePickers example"
     , body =
         [ div [ class "page" ]
-            [ div [ class "language-picker" ]
+            [ div [ class "picker-row" ]
                 [ h4 [] [ text "Select Language" ]
                 , div [ class "input-row" ]
                     [ label []
@@ -481,6 +489,25 @@ view model =
                         , text "Greek"
                         ]
                     ]
+                ]
+            , div [ class "picker-row" ]
+                [ h4 [] [ text "Select a \"starting weekday\" for the calendar" ]
+                , div [ class "input-row" ] <|
+                    List.map
+                        (\weekday ->
+                            label []
+                                [ input
+                                    [ type_ "radio"
+                                    , name "starting-weekday"
+                                    , value "starting-weekday"
+                                    , checked (model.startingWeekday == weekday)
+                                    , on "change" (Decode.succeed (HandleStartingWeekdayChange weekday))
+                                    ]
+                                    []
+                                , text (Extra.Time.Weekday.toString weekday)
+                                ]
+                        )
+                        [ Time.Sun, Time.Mon, Time.Tue, Time.Wed, Time.Thu, Time.Fri, Time.Sat ]
                 ]
             , case model.singleDatePicker of
                 Just picker ->
@@ -616,6 +643,7 @@ init flags =
             , doubleDateTimeRangePicker = Nothing
             }
       , language = English
+      , startingWeekday = Time.Sun
       }
     , Task.perform Initialise Time.now
     )
